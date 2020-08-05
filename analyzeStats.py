@@ -9,6 +9,7 @@ def loadFile(fName):
         arr = []
         for l in f:
             if 'Total Duration' in l: continue
+            if 'ucjf-zoom' in l: continue
             l = [x.strip() for x in l.split(',')]
             arr.append( [l[0], l[1], int(l[2]) ] )
 
@@ -317,6 +318,55 @@ def SessionsIsol(df):
     plt.close()
 
 
+def plotSessionsGender(df):
+    sess = df['session'].unique()
+    sess = np.sort(sess)[::-1]
+    vals = []
+
+    namesDict = {}
+    fNames = open('namesAll')
+    for l in fNames:
+        if 'null' in l: continue
+        l = l.split(' ')
+        l[2] = float(l[2])
+        if l[1] == 'female': l[2] = 1 - l[2]
+        #print(l[0], l[2])
+        namesDict[l[0]] = l[2]
+
+    for s in sess:
+        names = df[(df['session'] == s) & (df['mins'] >= 15)]['name'].unique()
+
+        nKnown = 0
+        isMale = 0
+        genderL = []
+        for n in names:
+            nameF = ""
+            for i in range(len(n)):
+                if n[i].isalpha():
+                    nameF += n[i]
+                else:
+                    break
+            if nameF in namesDict:
+                nKnown += 1
+                isMale += namesDict[nameF]
+                genderL.append(namesDict[nameF])
+
+        p = sum(genderL)/len(genderL)
+        for i in range(10):
+            gNow = 0
+            for m in genderL:
+                gNow += m*p / (m*p + (1-m)*(1-p))
+            p = gNow/len(genderL)
+
+        vals.append((1-p)*100)
+
+
+    plt.barh(sess, vals)
+    plt.subplots_adjust(left=0.3, right=0.9, top=0.9, bottom=0.1)
+    plt.xlabel('Female fraction [%]')
+    #plt.show()
+    plt.savefig('plots/SessionsGender.png')
+    plt.close()
 
 
 def analyze():
@@ -324,6 +374,7 @@ def analyze():
     dfPlen = loadPlenary()
 
     #printStats(df)
+    plotSessionsGender(df)
     plotDaysTotal(df, dfPlen)
     plotSessionsTotal(df)
     plotDurations(df)
