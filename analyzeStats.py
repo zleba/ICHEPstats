@@ -125,7 +125,7 @@ def plotDurations(df):
     plt.close()
 
 
-def plotStats(df):
+def printStats(df):
     df = df[df['mins'] >= 15]
     df['hours'] = 1./60.* df['mins']
     res = df.groupby('name')['hours'].agg(np.sum)
@@ -280,18 +280,54 @@ def SessionsCorr(df):
     plt.close()
 
 
+def SessionsIsol(df):
+    # Fraction of participants who visited only the particular session
+    df = df[df['mins'] >= 15]
+    
+    sess =  df['session'].unique()
+    sess = np.sort(sess)[::-1]
+
+
+    corrs = np.zeros(shape=(len(sess), len(sess)))
+
+    res = df.groupby('name').agg(np.unique)['session'].tolist()
+
+    isol = []
+
+    for s1 in sess:
+        nIsol = 0
+        nTot = 0
+        for a in res:
+            if s1 in a:
+                nIsol += isinstance(a,str)
+                nTot  += 1
+        isol.append(nIsol / nTot * 100)
+
+    plt.barh(sess, isol)
+    plt.subplots_adjust(left=0.3, right=0.9, top=0.9, bottom=0.1)
+    plt.xlabel('Isolation of participants [%]')
+    #plt.show()
+    plt.savefig('plots/SessionsIsolation.png')
+    plt.close()
+
+
+
+
 def analyze():
     df = loadAll()
     dfPlen = loadPlenary()
 
-    #plotStats(df)
-    #plotDaysTotal(df, dfPlen)
-    #plotSessionsTotal(df)
-    #plotDurations(df)
-    #plotDurationsCum(df)
+    #printStats(df)
+    plotDaysTotal(df, dfPlen)
+    plotSessionsTotal(df)
+    plotDurations(df)
+    plotDurationsCum(df)
 
-    #plotDaysVisited(df)
+    plotDaysVisited(df)
+
     SessionsCorr(df)
+    SessionsIsol(df)
+
 
 analyze()
 

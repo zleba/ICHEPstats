@@ -27,3 +27,9 @@ N(sessionX and sessionY) / min[N(sessionX), N(sessionY)] in [%]
 i.e. [overlap coefficient](https://en.wikipedia.org/wiki/Overlap_coefficient)
 
 ![Histogram of days](plots/SessionsCorr.png)
+
+
+### Isolation of the sessions
+Fraction of participants visiting only the particular session
+
+![Histogram of isolation](plots/SessionsIsolation.png)
