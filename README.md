@@ -2,7 +2,7 @@
 
 ## Parallel Sessions (Zoom)
 
-### Number of unique participants for each day
+### Number of unique participants for each day (including plenaries)
 ![Histogram of participants wrt day](plots/DaysTotal.png)
 
 

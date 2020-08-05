@@ -48,12 +48,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def loadPlenary():
-    d = loadFile('Plenaries/ICHEP2020_Plenary1.csv')
-    df = pd.DataFrame(d, columns = ['name', 'mail', 'mins']) 
-    df['day'] = 'Monday'
-    df['session'] = 'Plenary'
+    dfAll = pd.DataFrame(columns = ['name', 'mail', 'mins', 'day', 'session'])
+    for i,d in  enumerate(['Monday', 'Tuesday']):
+        data = loadFile('Plenaries/ICHEP2020_Plenary'+str(i+1)+'.csv')
+        df = pd.DataFrame(data, columns = ['name', 'mail', 'mins']) 
+        df['day'] = d
+        df['session'] = 'Plenary'
+        dfAll = dfAll.append(df)
 
-    return df
+    return dfAll
 
 def loadAll():
 
@@ -81,10 +84,13 @@ def plotDaysTotal(df, dfPlen):
         val = len(df[(df['day'] == d) & (df['mins'] >= 15)]['name'].unique())
         vals.append(val)
 
-    valPlen = len(dfPlen[dfPlen['mins'] >= 15]['name'].unique())
-    days.append('Monday')
-    vals.append(valPlen)
+    for d in ['Monday', 'Tuesday']:
+        valPlen = len(dfPlen[(dfPlen['mins'] >= 15) & (dfPlen['day'] == d)]['name'].unique())
+        days.append(d)
+        vals.append(valPlen)
 
+    
+    days[-1] = ' '+days[-1]+' '
     plt.bar(days, vals)
     plt.ylabel('#participants')
     #plt.show()
