@@ -23,6 +23,7 @@
 
 
 ### Correlation between sessions
-N(sessionX and sessionY) / N(sessionX or sessionY) in [%]
+N(sessionX and sessionY) / min[N(sessionX), N(sessionY)] in [%]
+i.e. [overlap coefficient](https://en.wikipedia.org/wiki/Overlap_coefficient)
 
 ![Histogram of days](plots/SessionsCorr.png)

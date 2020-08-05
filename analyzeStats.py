@@ -47,6 +47,14 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+def loadPlenary():
+    d = loadFile('Plenaries/ICHEP2020_Plenary1.csv')
+    df = pd.DataFrame(d, columns = ['name', 'mail', 'mins']) 
+    df['day'] = 'Monday'
+    df['session'] = 'Plenary'
+
+    return df
+
 def loadAll():
 
     dfAll = pd.DataFrame(columns = ['name', 'mail', 'mins', 'day', 'session'])
@@ -61,9 +69,11 @@ def loadAll():
             dfAll = dfAll.append(df)
             #print(df)
 
+    dfAll['mins'] = np.clip(dfAll['mins'], a_min=0, a_max=60*6)
+
     return dfAll
 
-def plotDaysTotal(df):
+def plotDaysTotal(df, dfPlen):
     days = []
     vals = []
     for d in df['day'].unique():
@@ -71,6 +81,9 @@ def plotDaysTotal(df):
         val = len(df[(df['day'] == d) & (df['mins'] >= 15)]['name'].unique())
         vals.append(val)
 
+    valPlen = len(dfPlen[dfPlen['mins'] >= 15]['name'].unique())
+    days.append('Monday')
+    vals.append(valPlen)
 
     plt.bar(days, vals)
     plt.ylabel('#participants')
@@ -110,6 +123,33 @@ def plotDurations(df):
     #plt.show()
     plt.savefig('plots/timeHist.png')
     plt.close()
+
+
+def plotStats(df):
+    df = df[df['mins'] >= 15]
+    df['hours'] = 1./60.* df['mins']
+    res = df.groupby('name')['hours'].agg(np.sum)
+
+    nPart = len(res)
+    totTime = res.sum()
+
+    print('nPart: ',nPart)
+    print('totTime: ',int(round(totTime,0)), 'PersonHours')
+    print('timeAvg: ', round(totTime/nPart,1),'hours')
+    print('timeMed: ', round(res.median(),1),'hours')
+    
+    #plt.hist(res, bins=np.arange(0,25, 0.25)  )
+    ##res.hist()
+
+    #plt.xlabel('Attended [hours]')
+    #plt.ylabel('#participants')
+
+    ##plt.show()
+    #plt.savefig('plots/timeHist.png')
+    #plt.close()
+
+
+
 
 
 def plotDurationsCum(df):
@@ -201,11 +241,15 @@ def SessionsCorr(df):
     for i1,s1 in enumerate(sess):
         for i2,s2 in enumerate(sess):
             n12a = n12o =0
+            n1=n2= 0
             for a in res:
+                n1   += (s1 in a)
+                n2   += (s2 in a)
                 n12a += (s1 in a) and (s2 in a)
                 n12o += (s1 in a) or (s2 in a)
 
-            corrs[i1][i2] = int(round(100 * n12a / n12o))
+            #corrs[i1][i2] = int(round(100 * n12a / n12o))
+            corrs[i1][i2] = int(round(100 * n12a / min(n1,n2)))
 
 
     #idx, corrs = cluster_corr(corrs)
@@ -238,12 +282,15 @@ def SessionsCorr(df):
 
 def analyze():
     df = loadAll()
-    plotDaysTotal(df)
-    plotSessionsTotal(df)
-    plotDurations(df)
-    plotDurationsCum(df)
+    dfPlen = loadPlenary()
 
-    plotDaysVisited(df)
+    #plotStats(df)
+    #plotDaysTotal(df, dfPlen)
+    #plotSessionsTotal(df)
+    #plotDurations(df)
+    #plotDurationsCum(df)
+
+    #plotDaysVisited(df)
     SessionsCorr(df)
 
 analyze()
