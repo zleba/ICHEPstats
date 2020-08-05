@@ -33,3 +33,9 @@ i.e. [overlap coefficient](https://en.wikipedia.org/wiki/Overlap_coefficient)
 Fraction of participants visiting only the particular session
 
 ![Histogram of isolation](plots/SessionsIsolation.png)
+
+
+### Gender profile of the sessions
+Fraction of female participants across ICHEP sessions
+
+![Female fraction in sessions](plots/SessionsGender.png)
