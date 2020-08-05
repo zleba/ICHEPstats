@@ -363,7 +363,7 @@ def plotSessionsGender(df):
 
     plt.barh(sess, vals)
     plt.subplots_adjust(left=0.3, right=0.9, top=0.9, bottom=0.1)
-    plt.xlabel('Female fraction [%]')
+    plt.xlabel('Fraction of females [%]')
     #plt.show()
     plt.savefig('plots/SessionsGender.png')
     plt.close()
