@@ -38,4 +38,4 @@ Fraction of participants visiting only the particular session
 ### Gender profile of the sessions
 Fraction of female participants across ICHEP sessions
 
-![Female fraction in sessions](plots/SessionsGender.png)
+![Fraction of females in sessions](plots/SessionsGender.png)
