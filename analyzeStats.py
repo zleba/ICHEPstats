@@ -363,7 +363,7 @@ def plotSessionsGender(df):
 
     plt.barh(sess, vals)
     plt.plot([50,50], [-0.4, 16.4], '--r')
-    plt.xlim(0,70)
+    plt.xlim(0,76)
     plt.subplots_adjust(left=0.3, right=0.9, top=0.9, bottom=0.1)
     plt.xlabel('Fraction of female participants [%]')
     #plt.show()
@@ -407,7 +407,7 @@ def plotSessionsGenderSpeakers(df):
 
     plt.barh(sess, vals)
     plt.plot([50,50], [-0.4, 16.4], '--r')
-    plt.xlim(0,70)
+    plt.xlim(0,76)
     plt.subplots_adjust(left=0.3, right=0.9, top=0.9, bottom=0.1)
     plt.xlabel('Fraction of female speakers [%]')
     #plt.show()
@@ -492,11 +492,13 @@ def plotTotalGender(df):
     lab  = ["From participants", "From speakers"]
     vals = [fracPartic, fracSpeakers]
 
+    print('fracParticipants', fracPartic)
+    print('fracSpeakrs', fracSpeakers)
 
     plt.figure(figsize=(7, 3))
     plt.barh(lab, vals)
     plt.plot([50,50], [-0.4, 1.4], '--r')
-    plt.xlim(0,70)
+    plt.xlim(0,76)
     plt.subplots_adjust(left=0.3, right=0.9, top=0.9, bottom=0.14)
     plt.xlabel('Fraction of females [%]')
     #plt.show()
