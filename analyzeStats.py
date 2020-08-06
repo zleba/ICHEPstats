@@ -362,28 +362,170 @@ def plotSessionsGender(df):
 
 
     plt.barh(sess, vals)
+    plt.plot([50,50], [-0.4, 16.4], '--r')
+    plt.xlim(0,70)
     plt.subplots_adjust(left=0.3, right=0.9, top=0.9, bottom=0.1)
-    plt.xlabel('Fraction of females [%]')
+    plt.xlabel('Fraction of female participants [%]')
     #plt.show()
     plt.savefig('plots/SessionsGender.png')
     plt.close()
+
+def plotSessionsGenderSpeakers(df):
+    sess = df['session'].unique()
+    sess = np.sort(sess)[::-1]
+
+    vals = []
+    for n in sess:
+        with open('speakers/'+n+".gen", 'r') as file:
+            data = file.read().replace('\n', '')
+            data = '['+ data + ']'
+            data = data.replace('null','None')
+            #print(len(data.splitlines()))
+            Names = eval(data)
+            #print(data)
+            #print(Names)
+
+            genderL = []
+            for i in Names:
+                if i['gender'] != None:
+                    #print(i['gender'], i['probability'])
+                    prob = i['probability']
+                    if i['gender'] == 'female' : prob = 1 - prob
+                    genderL.append(prob)
+
+            p = sum(genderL)/len(genderL)
+            print(n,(1-p)*100, len(genderL))
+            for i in range(10):
+                gNow = 0
+                for m in genderL:
+                    gNow += m*p / (m*p + (1-m)*(1-p))
+                p = gNow/len(genderL)
+
+            res = sum([1 for x in genderL if x <= 0.5])/len(genderL)*100
+            print(n,  res)
+            vals.append(res)
+
+    plt.barh(sess, vals)
+    plt.plot([50,50], [-0.4, 16.4], '--r')
+    plt.xlim(0,70)
+    plt.subplots_adjust(left=0.3, right=0.9, top=0.9, bottom=0.1)
+    plt.xlabel('Fraction of female speakers [%]')
+    #plt.show()
+    plt.savefig('plots/SessionsGenderSpeakers.png')
+    plt.close()
+
+
+def plotTotalGender(df):
+    #From the participants
+    namesDict = {}
+    fNames = open('namesAll')
+    for l in fNames:
+        if 'null' in l: continue
+        l = l.split(' ')
+        l[2] = float(l[2])
+        if l[1] == 'female': l[2] = 1 - l[2]
+        #print(l[0], l[2])
+        namesDict[l[0]] = l[2]
+
+    names = df[(df['mins'] >= 15)]['name'].unique()
+
+    nKnown = 0
+    isMale = 0
+    genderL = []
+    for n in names:
+        nameF = ""
+        for i in range(len(n)):
+            if n[i].isalpha():
+                nameF += n[i]
+            else:
+                break
+        if nameF in namesDict:
+            nKnown += 1
+            isMale += namesDict[nameF]
+            genderL.append(namesDict[nameF])
+
+    p = sum(genderL)/len(genderL)
+    for i in range(10):
+        gNow = 0
+        for m in genderL:
+            gNow += m*p / (m*p + (1-m)*(1-p))
+        p = gNow/len(genderL)
+
+    fracPartic = (1-p)*100
+    print(fracPartic)
+
+    # From the speakers
+    sess = df['session'].unique()
+    sess = np.sort(sess)[::-1]
+
+    genderL = []
+    for n in sess:
+        with open('speakers/'+n+".gen", 'r') as file:
+            data = file.read().replace('\n', '')
+            data = '['+ data + ']'
+            data = data.replace('null','None')
+            #print(len(data.splitlines()))
+            Names = eval(data)
+            #print(data)
+            #print(Names)
+
+            for i in Names:
+                if i['gender'] != None:
+                    #print(i['gender'], i['probability'])
+                    prob = i['probability']
+                    if i['gender'] == 'female' : prob = 1 - prob
+                    genderL.append(prob)
+
+    p = sum(genderL)/len(genderL)
+    print(n,(1-p)*100, len(genderL))
+    for i in range(10):
+        gNow = 0
+        for m in genderL:
+            gNow += m*p / (m*p + (1-m)*(1-p))
+        p = gNow/len(genderL)
+
+    #fracSpeakers = sum([1 for x in genderL if x <= 0.5])/len(genderL)*100
+    fracSpeakers = 100*(1-p)
+
+    #print(fracSpeakers, 100*(1-p))
+
+    lab  = ["From participants", "From speakers"]
+    vals = [fracPartic, fracSpeakers]
+
+
+    plt.figure(figsize=(7, 3))
+    plt.barh(lab, vals)
+    plt.plot([50,50], [-0.4, 1.4], '--r')
+    plt.xlim(0,70)
+    plt.subplots_adjust(left=0.3, right=0.9, top=0.9, bottom=0.14)
+    plt.xlabel('Fraction of females [%]')
+    #plt.show()
+    plt.savefig('plots/TotalGender.png')
+    plt.close()
+
+
 
 
 def analyze():
     df = loadAll()
     dfPlen = loadPlenary()
 
+    plotSessionsGenderSpeakers(df)
+
+    plotTotalGender(df)
+
     #printStats(df)
+
     plotSessionsGender(df)
-    plotDaysTotal(df, dfPlen)
-    plotSessionsTotal(df)
-    plotDurations(df)
-    plotDurationsCum(df)
+    #plotDaysTotal(df, dfPlen)
+    #plotSessionsTotal(df)
+    #plotDurations(df)
+    #plotDurationsCum(df)
 
-    plotDaysVisited(df)
+    #plotDaysVisited(df)
 
-    SessionsCorr(df)
-    SessionsIsol(df)
+    #SessionsCorr(df)
+    #SessionsIsol(df)
 
 
 analyze()
